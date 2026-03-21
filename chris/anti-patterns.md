@@ -1,6 +1,6 @@
 # Chris — Anti-Patterns Reference
 
-19 anti-patterns organized by source. Each has a Do/Don't code example.
+21 anti-patterns organized by source. Each has a Do/Don't code example.
 
 ---
 
@@ -322,3 +322,50 @@ test('plating guard rejects over-receive', async () => {
 // E2E only for flows that REQUIRE a browser:
 test('full lifecycle: receive → withdraw → produce → ship', async ({ page }) => { ... });
 ```
+
+---
+
+### 20. After-Each Cleanup Breaking Parallelism
+Using `afterEach` to truncate shared tables while other workers are still querying them.
+
+```typescript
+// ❌ DON'T — worker-1 truncates while worker-2 is mid-query
+afterEach(async () => {
+  await db.query('TRUNCATE store_receiving_log CASCADE')
+})
+
+// ✅ DO — use afterAll with worker-scoped prefixes so cleanup only hits YOUR data
+afterAll(async () => {
+  await db.query('DELETE FROM store_receiving_log WHERE bill_number LIKE $1', [`${TEST_PREFIX}%`])
+})
+```
+
+**Why:** `afterEach` + shared tables = race condition between workers.
+Worker-1's cleanup can delete rows that worker-2 just inserted and is about to assert on.
+Use `afterAll` with worker-isolated prefixes instead. (Source: goldbergyoni/nodejs-testing-best-practices)
+
+---
+
+### 21. Over-Abstraction Making Tests Undebuggable
+Hiding test logic behind layers of helpers/page-objects until failures are impossible to trace.
+
+```typescript
+// ❌ DON'T — 4 layers of abstraction, error says "line 3 in helpers.ts"
+await testHelpers.createAndVerifyFullLifecycle({
+  customer: defaults.customer,
+  parts: defaults.parts,
+  options: { skipPlating: true, verifyDashboard: true },
+})
+
+// ✅ DO — inline the steps, even if slightly repetitive
+await gotoTab(page, 'receiving')
+await page.getByRole('button', { name: 'เพิ่มรายการ' }).click()
+await fillBatchForm(page, { bill: 'BILL-001', qty: 100 })
+await page.getByTestId('batch-save-btn').click()
+await expect(page.getByText(/สำเร็จ/)).toBeVisible()
+```
+
+**Why:** When a test fails, you need to see WHAT happened at a glance.
+Deep abstraction saves LOC but costs hours of debugging.
+Keep helpers small and single-purpose (1 action each), never multi-step orchestrators.
+(Source: NoriSte/ui-testing-best-practices)
