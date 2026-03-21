@@ -129,6 +129,16 @@ export default defineConfig({
 - Use worker-isolated prefixes: `test-${test.info().workerIndex}-`
 - Never depend on data from another test
 - Clean up after each test
+- **CRITICAL: Scope ALL locators to your test's data prefix** — never use generic
+  text like `text=Pending` + `.first()` to pick from a list. Under parallel load,
+  other workers create similar data and `.first()` grabs the wrong row.
+  Always include your unique prefix in the locator:
+  ```typescript
+  // ❌ Grabs any worker's pending row
+  page.locator('tr', { has: page.locator('text=Pending') }).first()
+  // ✅ Grabs only YOUR test's row
+  page.locator('tr', { has: page.locator(`text=${TEST_PREFIX}BILL-001`) }).first()
+  ```
 
 ---
 

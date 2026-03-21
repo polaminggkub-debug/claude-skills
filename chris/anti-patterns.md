@@ -1,6 +1,6 @@
 # Chris — Anti-Patterns Reference
 
-18 anti-patterns organized by source. Each has a Do/Don't code example.
+19 anti-patterns organized by source. Each has a Do/Don't code example.
 
 ---
 
@@ -273,7 +273,35 @@ test('employee list — sorts by name on header click', ...);
 test('employee list — filters by department', ...);
 ```
 
-### 18. Over-Testing (Coverage Theater)
+### 18. Unscoped Locators in Parallel Tests
+Locators that match ANY worker's data instead of only YOUR test's data.
+
+```typescript
+// ❌ DON'T — matches the FIRST pending row, which may belong to another worker
+const requestRow = page.locator('.p-datatable-tbody tr', {
+  has: page.locator('text=Pending'),
+}).first()
+await requestRow.getByRole('button', { name: 'Approve' }).click()
+// Approves the WRONG request → creates records for wrong bill → test fails
+
+// ✅ DO — scope locator to YOUR test's unique data (prefix, bill number, etc.)
+const requestRow = page.locator('.p-datatable-tbody tr', {
+  has: page.locator(`text=${TEST_PREFIX}BILL-001`),
+}).first()
+await requestRow.getByRole('button', { name: 'Approve' }).click()
+```
+
+**Why this matters:** Tests pass with 1 worker but fail randomly with parallel workers.
+Generic locators like `text=Pending` + `.first()` grab whatever row loads first —
+under parallel load, that's often another worker's data.
+
+**Rule:** Every locator that picks from a list MUST include your test's unique identifier
+(worker prefix, bill number, customer name). If the unique text is in a child/sibling
+element (e.g., expansion row), use XPath to navigate the DOM structure.
+
+---
+
+### 19. Over-Testing (Coverage Theater)
 Writing E2E tests for things that don't need E2E tests.
 
 ```typescript
