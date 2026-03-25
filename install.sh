@@ -3,7 +3,7 @@ set -e
 
 SKILLS_DIR="$HOME/.claude/skills"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SKILLS=("chris" "margaret")
+SKILLS=("chris" "formpress" "margaret")
 
 mkdir -p "$SKILLS_DIR"
 
