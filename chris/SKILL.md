@@ -48,7 +48,7 @@ Inspired by Functional Core / Imperative Shell (Gary Bernhardt) and Test Pyramid
 | **Analyze** | "วิเคราะห์ code", "what should I test", "analyze for testability" | Architecture Map + test recommendations |
 | **Write** | "write tests for X", "เขียน test", "add tests" | Explanation first, then tests |
 | **Review** | "review my tests", "check these tests" | Verdict ≤200 words |
-| **Audit** | "audit test quality", "test audit" | 4-agent parallel audit → HTML report |
+| **Audit** | "audit test quality", "test audit" | 5-agent parallel audit → HTML report |
 
 **Important:** Write mode ALWAYS runs a lightweight Analyze first.
 
@@ -219,12 +219,13 @@ TRIM: [tests to remove or downgrade]
 ### Phase 0: File Manifest (MANDATORY)
 Read `phase0-manifest.md`.
 
-### Phase 1: Parallel Analysis (4 agents, ONE message)
+### Phase 1: Parallel Analysis (5 agents, ONE message)
 Read `agent-prompts.md`. Launch:
 - **Agent A: Validity** — Are tests testing real things?
 - **Agent B: ROI & Trim** — Which tests cost more than they're worth?
 - **Agent C: Performance** — Are tests fast enough?
 - **Agent D: Architecture & Testability** — Maintainable? Code designed in testable units? Happy paths covered?
+- **Agent E: Coverage Gap** — What features exist in source code but have NO test at all?
 
 ### Phase 2: Verification
 CONFIRMED / ALREADY FIXED / NOT A BUG / DESIGN CHOICE

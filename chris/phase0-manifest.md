@@ -23,12 +23,14 @@ playwright.config.ts       → config
 | B: ROI & Trim | ALL TEST files | Identify what to KEEP / DOWNGRADE / REMOVE |
 | C: Performance | ALL `*.spec.ts` + `playwright.config.ts` + helper files | Check speed & reliability |
 | D: Architecture | ALL `*.spec.ts` + ALL SOURCE files + shared fixtures | Check structure, maintainability, and testable design |
+| E: Coverage Gap | ALL SOURCE files (`*.vue`, `*.ts` composables) + ALL TEST files for cross-reference | Find features with ZERO test coverage |
 
 **Rules:**
 - Agents A, B, C all read test files but with DIFFERENT checklists
 - Agent D reads BOTH test files AND source files to assess testable architecture
-- Every test file MUST appear in agents A, B, C, and D
-- Every source file MUST appear in agent D
+- **Agent E reads SOURCE files as primary, TEST files as cross-reference** — it inventories user actions from source, then checks if any test exercises them
+- Every test file MUST appear in agents A, B, C, D, and E (for cross-reference)
+- Every source file MUST appear in agents D and E
 
 ## Step 3: Build Agent Prompts with Explicit File Lists
 
@@ -49,6 +51,21 @@ YOUR ASSIGNED FILES:
 ...
 
 [Then include the agent's standard checklist from agent-prompts.md]
+```
+
+**Agent E special instruction:**
+```
+For each SOURCE file (Vue component, composable, dialog), inventory every user action:
+  [BUTTON] "บันทึก" — save action, dialog submit
+  [FIELD] NG quantity — InputNumber, required
+  [FIELD] reason_too_short — InputNumber, optional (expandable section)
+  [SELECT] adjustment_type — dropdown, determines flow
+  [CONDITIONAL] expand chevron — shows/hides reason grid
+  [VALIDATION] canSave — checks partId + ngQuantity + hasAnyReason
+  [COMPUTED] NG% — auto-calculated display
+
+Then cross-reference: which of these actions appear in ANY test file?
+Flag any action with NO test as a coverage gap.
 ```
 
 **Agent D special instruction:**
