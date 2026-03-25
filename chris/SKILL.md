@@ -172,9 +172,28 @@ Fails → suggest alternative or skip.
 - **Vitest**: `describe('[UnitName]', () => { ... })`
 - **Playwright**: read `playwright-config.md` first
 
-### Step 5: Verify
+### Step 5: Mutation-Assertion Table (E2E only — MANDATORY)
+
+For every E2E test, build a table mapping each user action that changes state to its assertion. This step exists because the most dangerous E2E pattern is writing `toBeVisible()` after a state change and calling it "verified." A real assertion must include a **specific expected value** that would be **wrong if the feature broke**.
+
+```
+| Action            | Where verified | Expected value           | Catches if broken            |
+|-------------------|---------------|--------------------------|------------------------------|
+| Create order $500 | Summary page  | total column shows $500  | Aggregation query wrong      |
+| Create order $500 | DB            | SUM(amount) = 500        | INSERT failed silently       |
+| Edit qty 10→7     | Detail page   | qty cell shows 7         | UPDATE didn't persist        |
+```
+
+**Red flags** — rewrite the assertion if:
+- "Expected value" says `toBeVisible()` or `toContainText(successMsg)` — that's garbage, it proves existence not correctness
+- "Expected value" has no concrete number or string — too vague to catch a real bug
+- "Where verified" is only DB, never UI — the display layer uses a different code path and may diverge from the DB
+- Comment says "verify X" but assertion only checks visibility — misleading
+
+### Step 6: Verify
 
 - Each test maps to a spec scenario?
+- **Every action that changes state has a value assertion, not just a visibility check?** (Step 5 table complete?)
 - Would it fail if logic breaks?
 - Testing spec, not implementation?
 - Happy path covered?

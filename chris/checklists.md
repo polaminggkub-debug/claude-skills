@@ -35,6 +35,9 @@ Does the test actually test what it claims?
 - [ ] **Show the math** — Comments explain derivation (e.g., `// 50000/30 × 10 × 1.5 = 25000`)
 - [ ] **Breaking the logic WOULD fail this test** — Mentally break the code and verify
 - [ ] **No garbage assertions** — Every assertion checks a specific value, not just existence
+- [ ] **No visibility-only checks after state changes** — After mutations, assert the expected value, not just `toBeVisible()` (anti-pattern #21)
+- [ ] **No DB-only verification** — If testing DB state, also verify the same value in the UI (anti-pattern #22)
+- [ ] **No ambiguous substring matches** — `toContainText('25')` on a whole row can match dates, IDs, or other columns (anti-pattern #23)
 - [ ] **No weakened assertions** — No relaxed checks to accommodate known bugs
 - [ ] **No logic in tests** — No if/else, for loops, try/catch (except `test.each`)
 - [ ] **AAA pattern** — Clear Arrange → Act → Assert sections

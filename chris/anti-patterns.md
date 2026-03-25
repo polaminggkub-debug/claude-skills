@@ -1,6 +1,6 @@
 # Chris — Anti-Patterns Reference
 
-21 anti-patterns organized by source. Each has a Do/Don't code example.
+24 anti-patterns organized by source. Each has a Do/Don't code example.
 
 ---
 
@@ -346,7 +346,61 @@ Use `afterAll` with worker-isolated prefixes instead. (Source: goldbergyoni/node
 
 ---
 
-### 21. Over-Abstraction Making Tests Undebuggable
+### 21. Visibility-Only Verification After State Change
+Navigating to another page after a mutation and only checking that a row exists, not that it shows the correct values.
+
+This is the most dangerous garbage assertion because it *looks* thorough — you did navigate to the page, you did find the row. But `toBeVisible()` passes whether the row shows 100 or 0 or nothing at all.
+
+```typescript
+// ❌ DON'T — comment says "verify" but assertion only checks existence
+// "Dashboard verification: order total should reflect new item"
+await page.goto('/dashboard')
+const row = page.locator('tr', { hasText: 'ORD-001' })
+await expect(row).toBeVisible()  // ← passes even if total shows $0
+
+// ✅ DO — assert the actual value you expect to see
+await page.goto('/dashboard')
+const row = page.locator('tr', { hasText: 'ORD-001' })
+await expect(row).toBeVisible()
+// Hand-calculated: 3 items × $50 = $150
+await expect(row.locator('[data-col="total"]')).toContainText('150')
+```
+
+**Why this matters:** The UI often uses a different query or function than what your DB verify checks. The DB can be correct while the UI shows stale or wrong data. If you only assert visibility, you'll never catch the mismatch.
+
+### 22. DB Verify Without UI Verify
+Checking the database directly but never asserting the same value appears in the UI. This gives false confidence — the data layer may be correct while the display layer uses a completely different code path (different SQL function, different aggregation, stale cache).
+
+```typescript
+// ❌ DON'T — DB correct but UI untested
+const result = await db.query('SELECT total FROM orders WHERE id = $1', [orderId])
+expect(result.rows[0].total).toBe(150)  // ✅ DB is right
+await expect(page.locator('.order-row')).toBeVisible()  // ❌ UI value unchecked
+
+// ✅ DO — verify both layers show the same value
+const result = await db.query('SELECT total FROM orders WHERE id = $1', [orderId])
+expect(result.rows[0].total).toBe(150)
+await expect(page.locator('.order-row .total')).toContainText('150')
+```
+
+**Why this matters:** The DB might use `fn_calculate_total()` while the UI calls `fn_dashboard_summary()` — two different functions that can return different results. Testing only one layer misses bugs in the other.
+
+### 23. Ambiguous toContainText on Wide Rows
+Using `toContainText('25')` on an entire table row that has dates, IDs, and multiple numeric columns. The number 25 could match a date (`2025-...`), a percentage, a row count, or any other field — not just the column you intended.
+
+```typescript
+// ❌ DON'T — "25" could match date "2025-01-15", qty "125", or ID "P-250"
+const row = page.locator('tr', { hasText: 'ORD-001' })
+await expect(row).toContainText('25')  // which "25"?
+
+// ✅ DO — scope to the specific column or cell
+const row = page.locator('tr', { hasText: 'ORD-001' })
+await expect(row.locator('td').nth(3)).toContainText('25')  // remaining column
+// or better: use a data-testid or column header relationship
+await expect(row.locator('[data-col="remaining"]')).toContainText('25')
+```
+
+### 24. Over-Abstraction Making Tests Undebuggable
 Hiding test logic behind layers of helpers/page-objects until failures are impossible to trace.
 
 ```typescript
