@@ -1,0 +1,8 @@
+name,width_mm,height_mm,common_name,region
+A4,210,297,A4,international
+A5,148,210,A5,international
+A3,297,420,A3,international
+B5,176,250,B5 (ISO),international
+B5_JIS,182,257,B5 (JIS),japan
+Letter,215.9,279.4,Letter,us
+Legal,215.9,355.6,Legal,us
