@@ -20,7 +20,7 @@ problems humans miss.
 Ask the user:
 1. **What module/area?** — directory path or module name
 2. **Any known pain points?** — recent bugs, suspect areas
-3. **How many audit passes?** — 1-5 (default: 1). More passes = higher confidence via cross-referencing independent findings. Suggest 2-3 for important modules.
+3. **How many audit passes?** — You MUST ask this question and wait for an answer before proceeding. Show: "How many audit passes? (1-5, default 1 — suggest 2-3 for important modules)". Do not assume 1 and skip ahead.
 
 Identify: **source code** dirs, **test** dirs, **SQL migrations** (if any).
 
