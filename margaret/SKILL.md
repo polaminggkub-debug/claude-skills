@@ -169,6 +169,10 @@ Finds issues that are technically correct but practically absurd.
    | 3    | 10    | 4                         | 6       |
    ```
    This shows diminishing returns clearly — helps users decide if more passes are worth it.
+6. Add an **Optimal Pass Recommendation** after the table:
+   - Calculate: at which pass did "New findings" drop below 10% of Pass 1's total?
+   - State clearly: "Based on this audit, **[X] passes** is the sweet spot for this module — pass [X+1] onward found fewer than 10% new findings."
+   - If all passes found significant new findings, say: "All [N] passes contributed meaningfully — consider running more next time."
 
 1. Read `report-template.md` for the full HTML/CSS template
 2. Generate an HTML file using the template, populated with ALL verified findings

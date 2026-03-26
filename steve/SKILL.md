@@ -176,6 +176,7 @@ If N = 1, skip this section — run Phases 1-3 as normal below.
 5. Add a **Multi-Pass Summary** section at top of report:
    - Passes run: N | High confidence: count | Review: count | Total unique: count
 6. Add a **Per-Pass Breakdown** table showing: Pass number, findings count, new findings (not in prior passes), overlap count, and score — shows diminishing returns clearly.
+7. Add an **Optimal Pass Recommendation**: at which pass did new findings drop below 10% of Pass 1's total? State the sweet spot clearly so the user knows how many passes to run next time.
 
 Report contents:
 - Score ring (0-100), 4 category bars, radar chart

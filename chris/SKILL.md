@@ -274,6 +274,7 @@ Read `report-template.md`. Include Architecture Map + Happy Path Coverage.
 4. Add a **Multi-Pass Summary** section at top of report:
    - Passes run: N | High confidence: count | Review: count | Total unique: count
 5. Add a **Per-Pass Breakdown** table showing: Pass number, findings count, new findings (not in prior passes), and overlap count — shows diminishing returns clearly.
+6. Add an **Optimal Pass Recommendation**: at which pass did new findings drop below 10% of Pass 1's total? State the sweet spot clearly so the user knows how many passes to run next time.
 
 #### Test Budget (MANDATORY)
 ```
