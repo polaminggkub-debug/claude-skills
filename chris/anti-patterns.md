@@ -1,6 +1,6 @@
 # Chris — Anti-Patterns Reference
 
-24 anti-patterns organized by source. Each has a Do/Don't code example.
+26 anti-patterns organized by source. Each has a Do/Don't code example.
 
 ---
 
@@ -423,3 +423,13 @@ await expect(page.getByText(/สำเร็จ/)).toBeVisible()
 Deep abstraction saves LOC but costs hours of debugging.
 Keep helpers small and single-purpose (1 action each), never multi-step orchestrators.
 (Source: NoriSte/ui-testing-best-practices)
+
+### 25. Unscoped Floating Overlays
+Frameworks teleport overlays to `<body>`. Multiple open = ambiguous locators.
+
+**Rule:** Scope to visible overlay. Wait for dismiss before opening next.
+
+### 26. Async Action-Consequence Gap
+Action triggers async fetch → test clicks result before it loads.
+
+**Rule:** After any action that fetches data, `await expect(target).toBeVisible()` before interacting.
