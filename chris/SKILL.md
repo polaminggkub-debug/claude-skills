@@ -273,6 +273,7 @@ Read `report-template.md`. Include Architecture Map + Happy Path Coverage.
 3. Sort: HIGH CONFIDENCE (≥2 passes) first, then REVIEW (1 pass only)
 4. Add a **Multi-Pass Summary** section at top of report:
    - Passes run: N | High confidence: count | Review: count | Total unique: count
+5. Add a **Per-Pass Breakdown** table showing: Pass number, findings count, new findings (not in prior passes), and overlap count — shows diminishing returns clearly.
 
 #### Test Budget (MANDATORY)
 ```

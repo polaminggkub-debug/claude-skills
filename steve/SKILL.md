@@ -175,6 +175,7 @@ If N = 1, skip this section — run Phases 1-3 as normal below.
 4. Scores: average across passes (e.g., if Pass 1 scores 72 and Pass 2 scores 68, report 70/100)
 5. Add a **Multi-Pass Summary** section at top of report:
    - Passes run: N | High confidence: count | Review: count | Total unique: count
+6. Add a **Per-Pass Breakdown** table showing: Pass number, findings count, new findings (not in prior passes), overlap count, and score — shows diminishing returns clearly.
 
 Report contents:
 - Score ring (0-100), 4 category bars, radar chart

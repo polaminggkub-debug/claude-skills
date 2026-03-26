@@ -160,6 +160,15 @@ Finds issues that are technically correct but practically absurd.
    - High confidence findings (≥2 passes agree): count
    - Review findings (1 pass only): count
    - Total unique findings: count
+5. Add a **Per-Pass Breakdown** table:
+   ```
+   | Pass | Found | New (not in prior passes) | Overlap |
+   |------|-------|---------------------------|---------|
+   | 1    | 12    | 12 (baseline)             | —       |
+   | 2    | 15    | 7                         | 8       |
+   | 3    | 10    | 4                         | 6       |
+   ```
+   This shows diminishing returns clearly — helps users decide if more passes are worth it.
 
 1. Read `report-template.md` for the full HTML/CSS template
 2. Generate an HTML file using the template, populated with ALL verified findings
