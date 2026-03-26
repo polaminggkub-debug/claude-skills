@@ -20,7 +20,6 @@ problems humans miss.
 Ask the user:
 1. **What module/area?** — directory path or module name
 2. **Any known pain points?** — recent bugs, suspect areas
-3. **How many audit passes?** — You MUST ask this question and wait for an answer before proceeding. Show: "How many audit passes? (1-5, default 1 — suggest 2-3 for important modules)". Do not assume 1 and skip ahead.
 
 Identify: **source code** dirs, **test** dirs, **SQL migrations** (if any).
 
@@ -33,7 +32,9 @@ Before starting, estimate and show token usage so the user can decide:
    - `cloc --quiet <target_dir>` → use "code" column total
    - Fallback: `git ls-files -- <target_dir> | xargs wc -l | tail -1` (subtract 20%)
 
-2. **Calculate estimate:**
+2. **Ask the user (MANDATORY — do not skip):** "How many audit passes? (1-5, default 1 — suggest 2-3 for important modules)". Wait for their answer before proceeding. Do not assume 1 and skip ahead.
+
+3. **Calculate estimate:**
    ```
    code_tokens = lines × 1.3
    read_ratio = 0.5  (audit reads ~50% of codebase)
@@ -45,7 +46,7 @@ Before starting, estimate and show token usage so the user can decide:
    total = (tokens_per_pass × N) + merge_overhead
    ```
 
-3. **Show estimate:**
+4. **Show estimate:**
    ```
    📊 Pre-flight Estimate
    ━━━━━━━━━━━━━━━━━━━
