@@ -172,28 +172,9 @@ Fails → suggest alternative or skip.
 - **Vitest**: `describe('[UnitName]', () => { ... })`
 - **Playwright**: read `playwright-config.md` first
 
-### Step 5: Mutation-Assertion Table (E2E only — MANDATORY)
-
-For every E2E test, build a table mapping each user action that changes state to its assertion. This step exists because the most dangerous E2E pattern is writing `toBeVisible()` after a state change and calling it "verified." A real assertion must include a **specific expected value** that would be **wrong if the feature broke**.
-
-```
-| Action            | Where verified | Expected value           | Catches if broken            |
-|-------------------|---------------|--------------------------|------------------------------|
-| Create order $500 | Summary page  | total column shows $500  | Aggregation query wrong      |
-| Create order $500 | DB            | SUM(amount) = 500        | INSERT failed silently       |
-| Edit qty 10→7     | Detail page   | qty cell shows 7         | UPDATE didn't persist        |
-```
-
-**Red flags** — rewrite the assertion if:
-- "Expected value" says `toBeVisible()` or `toContainText(successMsg)` — that's garbage, it proves existence not correctness
-- "Expected value" has no concrete number or string — too vague to catch a real bug
-- "Where verified" is only DB, never UI — the display layer uses a different code path and may diverge from the DB
-- Comment says "verify X" but assertion only checks visibility — misleading
-
-### Step 6: Verify
+### Step 5: Verify
 
 - Each test maps to a spec scenario?
-- **Every action that changes state has a value assertion, not just a visibility check?** (Step 5 table complete?)
 - Would it fail if logic breaks?
 - Testing spec, not implementation?
 - Happy path covered?
@@ -216,8 +197,58 @@ TRIM: [tests to remove or downgrade]
 
 ## Audit Mode
 
+### Pre-flight Estimate (MANDATORY before audit)
+
+Before starting, estimate and show token usage:
+
+1. **Count source lines** (pick first available):
+   - `tokei <target_dir>` → use "code" lines total
+   - `cloc --quiet <target_dir>` → use "code" column total
+   - Fallback: `git ls-files -- <target_dir> | xargs wc -l | tail -1` (subtract 20%)
+
+2. **Ask:** How many audit passes? (1-5, default: 1)
+   - More passes = higher confidence via independent cross-referencing
+   - Suggest 2-3 for critical test suites
+
+3. **Calculate and show:**
+   ```
+   code_tokens = lines × 1.3
+   tokens_per_pass = (code_tokens × 0.5) + 20K overhead + 8K output
+   merge_overhead = 12K × (N - 1)
+   total = (tokens_per_pass × N) + merge_overhead
+
+   📊 Pre-flight Estimate
+   ━━━━━━━━━━━━━━━━━━━
+   Codebase: [X] files, [Y] lines (~[Z]K tokens)
+   Passes: [N]
+   Est. per pass: ~[A]K tokens
+   Est. total: ~[B]K tokens (incl. merge)
+   ━━━━━━━━━━━━━━━━━━━
+   ```
+   Proceed (no confirmation needed unless >500K).
+
 ### Phase 0: File Manifest (MANDATORY)
 Read `phase0-manifest.md`.
+
+### Multi-Pass Execution (if N > 1)
+
+If the user requested more than 1 pass:
+
+1. **Phase 0 runs ONCE** — file manifest is deterministic, shared across all passes
+2. **For each pass (1 to N):** Launch **1 general-purpose Agent** with:
+   - Full Phase 1-3 instructions (from `agent-prompts.md`) + file manifest
+   - Instruction: "You are Pass [X] of [N]. Run all 5 analysis agents, verification, and common-sense check. Return ALL findings as structured output."
+   - **NO findings from other passes** — each pass is completely independent
+3. **Launch all N pass-agents in a SINGLE message** (parallel)
+4. After all passes return, merge findings then proceed to Phase 4
+
+**Merging findings:**
+- Same finding (same file:line + same issue) in ≥2 passes → **HIGH CONFIDENCE**
+- Finding in only 1 pass → **REVIEW** (still include, lower confidence)
+- Deduplicate by file location + description similarity
+- Each finding gets a confidence score: `[X/N passes]`
+
+If N = 1, skip this section — run Phases 1-3 as normal below.
 
 ### Phase 1: Parallel Analysis (5 agents, ONE message)
 Read `agent-prompts.md`. Launch:
@@ -235,6 +266,13 @@ Read common sense prompt from `agent-prompts.md`.
 
 ### Phase 4: HTML Report
 Read `report-template.md`. Include Architecture Map + Happy Path Coverage.
+
+**If multi-pass (N > 1):** Before generating the report, merge findings from all passes:
+1. Normalize findings by file:line + issue type
+2. Each finding gets a confidence badge: `[X/N passes]`
+3. Sort: HIGH CONFIDENCE (≥2 passes) first, then REVIEW (1 pass only)
+4. Add a **Multi-Pass Summary** section at top of report:
+   - Passes run: N | High confidence: count | Review: count | Total unique: count
 
 #### Test Budget (MANDATORY)
 ```

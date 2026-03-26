@@ -20,8 +20,42 @@ problems humans miss.
 Ask the user:
 1. **What module/area?** — directory path or module name
 2. **Any known pain points?** — recent bugs, suspect areas
+3. **How many audit passes?** — 1-5 (default: 1). More passes = higher confidence via cross-referencing independent findings. Suggest 2-3 for important modules.
 
 Identify: **source code** dirs, **test** dirs, **SQL migrations** (if any).
+
+## Pre-flight Estimate (MANDATORY before audit)
+
+Before starting, estimate and show token usage so the user can decide:
+
+1. **Count source lines** (pick first available):
+   - `tokei <target_dir>` → use "code" lines total
+   - `cloc --quiet <target_dir>` → use "code" column total
+   - Fallback: `git ls-files -- <target_dir> | xargs wc -l | tail -1` (subtract 20%)
+
+2. **Calculate estimate:**
+   ```
+   code_tokens = lines × 1.3
+   read_ratio = 0.5  (audit reads ~50% of codebase)
+   overhead = 23K    (system + skill + agent scaffolding)
+   output = 10K      (findings per pass)
+
+   tokens_per_pass = (code_tokens × read_ratio) + overhead + output
+   merge_overhead = 15K × (N - 1)  (only if N > 1)
+   total = (tokens_per_pass × N) + merge_overhead
+   ```
+
+3. **Show estimate:**
+   ```
+   📊 Pre-flight Estimate
+   ━━━━━━━━━━━━━━━━━━━
+   Codebase: [X] files, [Y] lines (~[Z]K tokens)
+   Passes: [N]
+   Est. per pass: ~[A]K tokens
+   Est. total: ~[B]K tokens (incl. merge)
+   ━━━━━━━━━━━━━━━━━━━
+   ```
+   Then proceed (no confirmation needed unless estimate is very large >500K).
 
 ## Reference Files
 
@@ -46,6 +80,28 @@ Before launching any agents, read `phase0-manifest.md` and build the file manife
    - Previous audit findings (if any) as context to avoid re-discovering known issues
 
 **Why this matters:** Without Phase 0, agents choose which files to read stochastically — each run covers different files, producing different findings. Phase 0 makes audits deterministic and one-run-done.
+
+### Multi-Pass Execution (if N > 1)
+
+If the user requested more than 1 pass, wrap Phases 1-3 in independent passes:
+
+1. **Phase 0 runs ONCE** — file manifest is deterministic, shared across all passes
+2. **For each pass (1 to N):** Launch **1 general-purpose Agent** with:
+   - The full Phase 1-3 instructions (from `agent-prompts.md`)
+   - The file manifest from Phase 0
+   - Instruction: "You are Pass [X] of [N]. Run all 7 analysis agents, verification, and common-sense check. Return ALL findings as structured output."
+   - **NO findings from other passes** — each pass is completely independent
+3. **Launch all N pass-agents in a SINGLE message** so they run in parallel
+4. After all passes return, proceed to Phase 4 with merged findings
+
+**Merging findings (before Phase 4):**
+- Same finding (same file:line + same issue) in ≥2 passes → **HIGH CONFIDENCE**
+- Finding in only 1 pass → **REVIEW** (still include, lower confidence)
+- Deduplicate by file location + description similarity
+- Each finding gets a confidence score: `[X/N passes]`
+- HIGH CONFIDENCE findings sort first in the report
+
+If N = 1, skip this section entirely — run Phases 1-3 as normal below.
 
 ### Phase 1: Parallel Deep Analysis
 
@@ -94,6 +150,16 @@ Finds issues that are technically correct but practically absurd.
 ### Phase 4: HTML Report (ALWAYS)
 
 **This phase is NOT optional.** Every audit MUST produce an HTML report file.
+
+**If multi-pass (N > 1):** Before generating the report, merge findings from all passes:
+1. Normalize findings by file:line + issue type
+2. Each finding gets a confidence badge: `[X/N passes]`
+3. Sort order: HIGH CONFIDENCE (≥2 passes) first, then REVIEW (1 pass only)
+4. Add a **Multi-Pass Summary** section at top of report:
+   - Passes run: N
+   - High confidence findings (≥2 passes agree): count
+   - Review findings (1 pass only): count
+   - Total unique findings: count
 
 1. Read `report-template.md` for the full HTML/CSS template
 2. Generate an HTML file using the template, populated with ALL verified findings
