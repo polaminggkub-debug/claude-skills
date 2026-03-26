@@ -91,7 +91,7 @@ Before starting, estimate and show token usage:
    - `cloc --quiet <target_dir>` → use "code" column total
    - Fallback: `git ls-files -- <target_dir> | xargs wc -l | tail -1` (subtract 20%)
 
-2. **Ask the user (MANDATORY — do not skip):** "How many audit passes? (1-5, default 1 — suggest 2-3 for design-critical pages)". Wait for their answer before proceeding. Do not assume 1 and skip ahead.
+2. **Ask the user (MANDATORY — do not skip):** "How many audit passes? (1-5, default 2 — recommended based on testing)". Wait for their answer before proceeding. Do not assume 1 and skip ahead.
 
 3. **Calculate and show:**
    ```
