@@ -154,7 +154,7 @@ If N = 1, skip this section — run Phases 1-3 as normal below.
 | A: Visual Design | Color, contrast, typography, spacing, whitespace | /25 |
 | B: UX Heuristics | Nielsen's 10 heuristics scored 0-4, cognitive load, flows | /25 |
 | C: Accessibility | WCAG 2.2 AA, keyboard, ARIA, touch targets, screen readers | /25 |
-| D: Consistency | Component patterns, responsive, theme, spacing scale, icons, DRY style patterns | /25 |
+| D: Consistency | Component patterns, component duplication, responsive, theme, spacing scale, icons, DRY style patterns | /25 |
 
 **Phase 2: Verification** — Launch **1 Agent (subagent_type=Explore)** to cross-reference findings:
 - Same issue from 2+ agents = HIGH CONFIDENCE (e.g., low contrast flagged by Visual + A11y)

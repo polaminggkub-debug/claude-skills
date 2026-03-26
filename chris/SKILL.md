@@ -255,7 +255,7 @@ Read `agent-prompts.md`. Launch:
 - **Agent A: Validity** — Are tests testing real things?
 - **Agent B: ROI & Trim** — Which tests cost more than they're worth?
 - **Agent C: Performance** — Are tests fast enough?
-- **Agent D: Architecture & Testability** — Maintainable? Code designed in testable units? Happy paths covered?
+- **Agent D: Architecture & Testability** — Maintainable? Code designed in testable units? Happy paths covered? Test code duplication?
 - **Agent E: Coverage Gap** — What features exist in source code but have NO test at all?
 
 ### Phase 2: Verification

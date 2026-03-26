@@ -351,7 +351,15 @@ A great design system is invisible — users never notice because everything jus
    - Neutral colors (grays) used consistently for text and borders
    - No color used for conflicting purposes on the same page
 
-9. **DRY Style Patterns** — Repeated class combinations should be centralized:
+9. **Component Duplication** — Same UI pattern reimplemented in multiple places:
+   - Same modal/dialog wrapper (overlay + close + slot) built separately in different features → extract shared component
+   - Same form field group (label + input + error) repeated across pages → shared form component
+   - Same table/list with identical column config pattern → shared data table component
+   - Same empty-state / loading-state / error-state template → shared status component
+   - Apply Rule of Three: 3+ occurrences = extract. 2 with 10+ lines = extract.
+   - **How to check:** Compare template structures across assigned files. Same HTML structure with different data bindings = extraction candidate.
+
+10. **DRY Style Patterns** — Repeated class combinations should be centralized:
    - Same Tailwind class combination (3+ classes) appearing in 3+ files → extract to shared CSS class via `@apply`
    - Same border color/style used for the same semantic purpose (e.g., row dividers, section separators) across files but with inconsistent values → unify and extract
    - Same HTML structure pattern (e.g., table header `<tr>` with identical styling) repeated across components → extract to shared CSS class or shared component

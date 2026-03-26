@@ -78,6 +78,15 @@ ASSIGNMENT LOGIC (FIFO, ordering, etc.)
   - What happens when capacity is exhausted (overflow)?
   - Could the same resource be assigned to two consumers?
 
+CODE DUPLICATION & SHARED COMPONENT OPPORTUNITIES
+  - Same logic (composable, utility, validation) copy-pasted across 2+ files? → extract to shared
+  - Same API call pattern (fetch + loading + error) repeated? → shared composable
+  - Same computed/derived value recalculated in multiple components? → shared utility
+  - Parallel type definitions or interfaces defined in multiple places?
+  - Same business rule (calculation, status transition) implemented independently in different features?
+  - Apply Rule of Three: 3+ occurrences = extract. 2 occurrences with 10+ lines = extract.
+  - Flag only TRUE duplication (same reason to change), not accidental similarity.
+
 For each issue: quote the exact code lines and explain the real-world impact.
 ```
 

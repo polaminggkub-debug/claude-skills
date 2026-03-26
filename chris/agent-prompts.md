@@ -138,6 +138,7 @@ For each file, report: [PASS] filename — no issues | [FAIL] filename — issue
 9. **Spec clarity** — Can you write a one-sentence spec for each unit? If not, the unit is doing too much.
 10. **Happy path coverage** — Does each identified unit have at least one happy path test?
 11. **Test-level appropriateness** — Are E2E tests being used for things that could be unit/integration tests?
+12. **Test code duplication** — Same mock setup, assertion sequences, or test data literals copy-pasted across 3+ files? → extract to shared test helpers/factories. Same render+interact+assert pattern repeated? → Page Object or shared test utility.
 
 ### Output:
 - **Pattern** — which issue

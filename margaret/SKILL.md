@@ -122,7 +122,7 @@ Agent(subagent_type="Explore", name="margaret-G-flow-integrity", prompt="...")
 | Agent | Focus | Reads |
 |-------|-------|-------|
 | A | Test Coverage | Test files — what's tested, what's not |
-| B | Business Logic Bugs | Models, composables, utilities |
+| B | Business Logic Bugs + Code Duplication | Models, composables, utilities — also finds shared component opportunities |
 | C | UI Component Bugs | Vue/React components |
 | D | Data Layer Bugs | SQL migrations, DB functions |
 | E | Security & Access | RLS, auth, input validation, secrets |
